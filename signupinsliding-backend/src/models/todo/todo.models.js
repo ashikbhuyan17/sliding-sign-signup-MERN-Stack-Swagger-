@@ -14,6 +14,10 @@ const todoSchema = mongoose.Schema({
         type: Date,
         default: Date.now,
     },
+    user: {
+        type: mongoose.Types.ObjectId,   // object id type
+        ref: "User"    //User model r sathe relation korthe cay tay ref User 
+    }
 
 });
 

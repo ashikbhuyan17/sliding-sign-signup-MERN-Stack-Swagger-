@@ -4,16 +4,18 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 const User = require('../../../models/authentication/user/user')
-const { signIn, signUp, getAllUser, requireSignIn } = require('../../../controller/authentication/user/user');
+const { signIn, signUp, getAllUser } = require('../../../controller/authentication/user/user');
 const { validateSignupRequest, validateSignInRequest, isRequestValidated } = require('../../../validators/auth')
+const { checkLogin } = require("../../../common-middleware/checkLogin")
 
 router.post('/signUp', validateSignupRequest, isRequestValidated, signUp)
 router.post('/signIn', validateSignInRequest, isRequestValidated, signIn)
-router.get('/getAllUser', requireSignIn, getAllUser)
+router.get('/getAllUser', checkLogin, getAllUser)
 
-router.post('/profile', requireSignIn, (req, res) => {
-    console.log(req.user);
-    let email = req.user.email
+router.post('/profile', checkLogin, (req, res) => {
+    // console.log(req.decoded);
+    // console.log(req.email);
+    let email = req.email
     // User.findOne({ email }, { hash_password: 0 })
     //     .exec((err, user) => {
     //         if (err) {
@@ -54,10 +56,10 @@ router.post('/profile', requireSignIn, (req, res) => {
 })
 
 
-router.put('/updateProfile/:id', requireSignIn, (req, res) => {
+router.put('/updateProfile/:id', checkLogin, (req, res) => {
     let contactNumber = req.body.contactNumber
     let role = req.body.role
-    console.log(req.params.id);
+    // console.log(req.params.id);
     User.findByIdAndUpdate({ _id: req.params.id }, {
         $set: {
             contactNumber: contactNumber,

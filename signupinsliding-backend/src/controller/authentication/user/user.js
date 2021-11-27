@@ -12,13 +12,13 @@ const signIn = (req, res) => {
             if (user) {
                 if (user.authenticate(req.body.password)) {
                     const token = jwt.sign({ email: user.email, _id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '24h' })
-                    const { _id, firstName, lastName, email, role, fullName } = user
+                    const { _id, firstName, lastName, userName, email, role, fullName } = user
                     return res.status(200).json({
                         token: {
                             token
                         },
                         user: {
-                            _id, email, role, fullName
+                            _id, fullName, userName, email, role
                         },
                     });
 
@@ -67,7 +67,7 @@ const signUp = (req, res) => {
 const getAllUser = (req, res) => {
     User.find()
         .exec((err, user) => {
-            console.log(user);
+            // console.log(user);
             if (err) {
                 res.status(400).json({ message: "not found" })
             }

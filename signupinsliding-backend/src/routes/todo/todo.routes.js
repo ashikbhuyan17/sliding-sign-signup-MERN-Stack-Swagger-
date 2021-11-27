@@ -2,11 +2,13 @@ const express = require("express");
 const mongoose = require("mongoose");
 const router = express.Router();
 const Todo = require("../../models/todo/todo.models");
+const { checkLogin } = require("../../../src/common-middleware/checkLogin")
 
 // GET ALL THE TODO's
-router.get("/", (req, res) => {
+router.get("/", checkLogin, (req, res) => {
     Todo.find({})
-        // .populate("user", "name username -_id")
+        .populate("user")
+        // .populate("user", "email firstName userName -_id")   => (minus -) add korle ( - _id) oigula dekhabe na 
         // .select({
         //     _id: 0,
         //     __v: 0,
@@ -81,7 +83,7 @@ router.get("/:id", async (req, res) => {
     }
 });
 
-// POST A TODO
+// POST A TODO with call back
 router.post("/", (req, res) => {
     const newTodo = new Todo(req.body);
     newTodo.save((err, data) => {
@@ -97,6 +99,30 @@ router.post("/", (req, res) => {
         }
     });
 });
+
+// POST A TODO with asynchronous
+router.post('/population', checkLogin, async (req, res) => {
+    console.log(req._id);
+
+
+
+    try {
+        const newTodo = new Todo({
+            ...req.body,
+            user: req._id,
+
+        });
+        await newTodo.save();
+        res.status(200).json({
+            message: "Todo was inserted successfully!",
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            error: "There was a server side error!",
+        });
+    }
+})
 
 
 // POST MULTIPLE TODO
